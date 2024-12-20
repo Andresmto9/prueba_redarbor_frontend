@@ -1,9 +1,33 @@
-import { getEmpleados, setEmpleados, getEmpleadosID, updateEmpleado, deleteEmpleado, deleteMultiEmpleados } from '../api/empleados.api'
-import { Datepicker } from 'flowbite';
+/** VALIDA SI NO HAY UNA SESIÓN ACTIVA ENVIARLO AL LOGIN **/
+if(!sessionStorage.getItem('session')){
+	location.href = "/";
+}
+/*********************************************************************************/
 
+/***** DECLARACIÓN DE FUNCIONALIDADES PARA EL CONSUMO DE LOS SERVICIOS USADOS *****/
+import {
+	getEmpleados,
+	setEmpleados,
+	getEmpleadosID,
+	updateEmpleado,
+	deleteEmpleado,
+	deleteMultiEmpleados
+} from '../api/empleados.api'
+/*********************************************************************************/
+
+/** CREACIÓN DE LA VISTA USADA PARA LOS EMPLEADOS **/
 document.querySelector('#empleados').innerHTML = `
 	<div class="col-span-12">
 		<div class="grid place-items-center col-span-12">
+			<div class="col-end-10 mt-5">
+				<button title="Salir" id="btnSalir" type="button" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-center text-white bg-amber-700 rounded-lg hover:bg-amber-800 focus:ring-4 focus:outline-none focus:ring-amber-300 dark:bg-amber-600 dark:hover:bg-amber-700 dark:focus:ring-amber-800">
+					<span class="inline-flex items-center justify-center w-6 h-6 text-xs">
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+  							<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+						</svg>
+					</span>
+				</button>
+			</div>
 			<div class="p-4 col-span-12">
 				<h1 class="text-3xl text-wrap hover:text-balance text-white">
 					Empleados
@@ -94,6 +118,9 @@ document.querySelector('#empleados').innerHTML = `
 		</div>
 	</div>
 `
+/*********************************************************************************/
+
+/** LLAMADO DE FUNCIONES PARA EL CONSUMO DE LOS SERVICIOS CREADOS **/
 
 /**
  * Función para realizar el llamado al consumo del servicio que obtiene los empleados existentes
@@ -104,31 +131,63 @@ async function getDataEmple(){
     return resp
 }
 
+/**
+ * Función para realizar el llamado al consumo que crea los empleados
+ * @param {JSON} arrEmple Recibe por parametro el array de datos para la creación de los empleados
+ * @returns retorna el objeto de respuesta del consumo
+ */
 async function setNuevoEmple(arrEmple){
 	const resp = await setEmpleados(arrEmple);
     return resp
 }
 
+/**
+ * Función para realizar el llamado al consumo que consulta la información de un empleado especifico mediante su ID
+ * @param {int} id Recibe por parametro el ID del empleado a consultar
+ * @returns retorna el objeto de respuesta del consumo
+ */
 async function getDataEmpleados(id){
 	const resp = await getEmpleadosID(id);
     return resp
 }
 
-async function updateEmpleTabla(arrEmple, ID){
-	const resp = await updateEmpleado(arrEmple, ID);
+/**
+ * Función para realizar el llamado al consumo que actualiza la información del empleado mediante su ID
+ * @param {JSON} arrEmple Recibe por parametro el array de datos para actualizar el empleado
+ * @param {int} id Recibe por parametro el ID del empleado que se va a actualizar
+ * @returns retorna el objeto de respuesta del consumo
+ */
+async function updateEmpleTabla(arrEmple, id){
+	const resp = await updateEmpleado(arrEmple, id);
     return resp
 }
 
+/**
+ * Función para realizar el llamado al consumo que elimina un empleado mediante su ID
+ * @param {int} id Recibe por parametro el id del empleado que se va a eliminar
+ * @returns retorna el objeto de respuesta del consumo
+ */
 async function deleteInfoEmpleado(id){
 	const resp = await deleteEmpleado(id);
     return resp
 }
 
+/**
+ * Función para realizar el llamado al consumo que elimina un grupo de empleados mediante sus ID's
+ * @param {JSON} arrEmpleID Recibe por parametro el array de ID's de los empleados a eliminar
+ * @returns retorna el objeto de respuesta del consumo
+ */
 async function deleteEmpleados(arrEmpleID) {
 	const resp = await deleteMultiEmpleados(arrEmpleID);
     return resp
 }
+/*********************************************************************************/
 
+/** CREACIÓN DE LAS FUNCIONALIDADES QUE SE REALIZARAN EN LA VISTA DE EMPLEADOS **/
+
+/**
+ * Funcionalidad para mostrar la tabla de los empleados y definir las interacciones que existiran dentro de las tablas
+ */
 const showTablaEmpleados = () => {
 	/**
 	 * Función que realiza la visualización de los usuarios y determinar sus funcionalidades
@@ -226,8 +285,9 @@ const showTablaEmpleados = () => {
 											}
 										})
 										.catch((error) => {
-											console.log(error)
+											validarError(error)
 										})
+										
 								}
 							});
 					})
@@ -254,12 +314,14 @@ const showTablaEmpleados = () => {
 				})
 			}
 		}).catch((error) => {
-			console.log(error)
+			validarError(error)
 		});
 }
 
-showTablaEmpleados()
-
+/**
+ * Funcionalidad para dar formato a los datos del formulario para registrar o actualizar el empleado
+ * @returns Retorna el objeto del empleado para registrar o actualizar
+ */
 const formatObjectEmple = () => {
 	const form = {
 		"name": $("#nombre").val(),
@@ -273,6 +335,10 @@ const formatObjectEmple = () => {
 	return form;
 }
 
+/**
+ * Funcionalidad para validar que el formulario se valido para crear o actualizar el empleado
+ * @returns Retorna si es valido el formulario para realizar la petición de crear o actualizar
+ */
 const valiRegiEmple = () => {
 	let vali = 1;
 	$('.formVali').each(function(){
@@ -294,6 +360,11 @@ const valiRegiEmple = () => {
 	return vali;
 }
 
+/**
+ * Funcionalidad para mostrar los datos existentes del empleado seleccionado en la tabla
+ * Adicional genera la funcionalidad para la actualización del empleado de manera dinamica
+ * @param {int} id Recibe por parametro el ID del empleado que se va a actualizar
+ */
 const setInfoEmpleado = (id) => {
 	getDataEmpleados(id)
 		.then((data) => {
@@ -314,19 +385,21 @@ const setInfoEmpleado = (id) => {
 					$("#btnActuUsua").on('click', function(){
 						if(valiRegiEmple() == 1){
 							const arrEmple = formatObjectEmple();
-							const ID = $(this).data('id');
-							arrEmple.id = ID;
+							const id = $(this).data('id');
+							arrEmple.id = id;
 
-							updateEmpleTabla(arrEmple, ID)
+							updateEmpleTabla(arrEmple, id)
 								.then((data) => {
 									if(data.status == 200){
 										showAlerta("¡PERFECTO!", `Se actualizo la información del empleado con éxito.`, "success", 1)
+									}else if(data.status == 409){
+										showAlerta("¡UN MOMENTO!", `Ya existe un empleado con el correo ingresado.`, "error", 0)
 									}else{
 										showAlerta("¡UN MOMENTO!", `Ocurrió un problema al actualizar la información del empleado.`, "error", 0)
 									}
 								})
 								.catch((error) => {
-									console.log(error)
+									validarError(error)
 								})
 						}
 					})
@@ -336,10 +409,15 @@ const setInfoEmpleado = (id) => {
 			}
 		})
 		.catch((error) => {
-			console.log(error)
+			validarError(error)
 		})
 }
 
+/**
+ * Funcionalidad para verificar que el correo electronico sea valido
+ * @param {string} email Recibe por parametro el texto del correo que se va a registrar
+ * @returns Retorna el valor del correo si este es valido
+ */
 const validarCorreo = (email) => {
 	return String(email)
 		.toLowerCase()
@@ -348,6 +426,13 @@ const validarCorreo = (email) => {
 	);
 };
 
+/**
+ * Funcionalidad para mostrar una alerta de manera dinamica
+ * @param {string} titulo Recibe por parametro el titulo que va en la alerta
+ * @param {string} texto Recibe por paremtro el texto de información que va en la alerta
+ * @param {string} icono Recibe por parametro del icono que va en la alerta
+ * @param {int} confirmacion Recibe por parametro si la alerta debe ejecutar alguna funcionalidad adicional
+ */
 const showAlerta = (titulo, texto, icono, confirmacion) => {
 	Swal.fire({
 		title: titulo,
@@ -365,10 +450,34 @@ const showAlerta = (titulo, texto, icono, confirmacion) => {
 	});
 }
 
+/**
+ * Funcionalidad para verificar el tipo de error que genera las peticiones realizadas
+ * @param {JSON} error Recibe por parametro el objeto con el detalle del error que genero la petición
+ */
+const validarError = (error) => {
+	if (error.response) {
+		showAlerta("¡ERROR!", `Error con la respuesta del servidor.`, "error", 0)
+	} else if (error.request) {
+		showAlerta("¡ERROR!", `Error en la solicitud.`, "error", 0)
+	} else {
+		showAlerta("¡ERROR!", `Error desconocido.`, "error", 0)
+	}
+}
+/*********************************************************************************/
+
+/** CREACIÓN DE LAS FUNCIONALIDADES DE LOS ELEMENTOS FIJOS EN LA VISTA **/
+
+/**
+ * Funcionalidad para cerrar el modal de la creación o edición del empelado
+ */
 $(".btnCerrarModal").on('click', function(){
 	modal.hide();
 })
 
+/**
+ * Funcionalidad para mostrar el modal de creación del empleado y incializa los inputs usados en el formulario
+ * Adicional genera el llamado del servicio para la creación del empleado
+ */
 $("#btnCreaModal").on('click', function(){
 	$("#contTituloModal").html(`Crear empleado`)
 
@@ -389,14 +498,17 @@ $("#btnCreaModal").on('click', function(){
 		
 				setNuevoEmple(arrEmple)
 					.then((data) => {
+						console.log(data);
 						if(data.status == 201){
 							showAlerta("¡PERFECTO!", `Se creo el empleado con éxito.`, "success", 1)
+						}else if(data.status == 409){
+							showAlerta("¡UN MOMENTO!", `El correo ingresado ya esta registrado, por favor verifique.`, "error", 0)
 						}else{
 							showAlerta("¡UN MOMENTO!", `Ocurrió un problema al registrar el empleado.`, "error", 0)
 						}
 					})
 					.catch((error) => {
-						console.log(error);
+						validarError(error)
 					})
 			}
 		})
@@ -405,6 +517,10 @@ $("#btnCreaModal").on('click', function(){
 	modal.show();
 })
 
+/**
+ * Funciónalidad para validar si hay empleados seleccionado para su eliminación
+ * Adicional a ello genera el llamado para la elimincación multiple de los empleados
+ */
 $("#btnElimEmple").on('click', function(){
 	let arrEmpleID = [];
 	$(".chkDeleEmple").each(function(key, value){
@@ -422,12 +538,30 @@ $("#btnElimEmple").on('click', function(){
 			}
 		})
 		.catch((error) => {
-			console.log(error)
+			validarError(error)
 		})
 })
 
+/**
+ * Funcionalidad para mostrar la vista del login
+ */
+$("#btnSalir").on('click', function(){
+	location.href = '/';
+	sessionStorage.removeItem('session');
+})
+/*********************************************************************************/
+
+/** CREACIÓN DE LOS ELEMENTOS DATEPICKER Y MODAL USADO EN LA VISTA **/
+
+/**
+ * Instacia de datepicker usado en la vista
+ */
 const $datepickerEl = document.getElementById('default-datepicker');
 
+/**
+ * Instacia de las opciones usadas en el datepicker
+ * Adicional valida que solo pueda ingresar valores con rangos de edad entre 18 a 65 años
+ */
 const options = {
     defaultDatepickerId: null,
     autohide: true,
@@ -443,15 +577,27 @@ const options = {
     onHide: () => {},
 };
 
+/**
+ * Instacia de opciones adicionales usadas en el datepicker
+ */
 const instanceOptions = {
   id: 'default-datepicker',
   override: true
 };
 
+/**
+ * Inicializa el datepicker usado en el formulario
+ */
 const datepicker = new Datepicker($datepickerEl, options, instanceOptions);
 
+/**
+ * Instacia del modal usado en la vista
+ */
 const $targetEl = document.getElementById('default-modal');
 
+/**
+ * Instacia de las opciones usadas en el modal
+ */
 const optionsModal = {
     placement: 'bottom-right',
     backdrop: 'dynamic',
@@ -460,9 +606,21 @@ const optionsModal = {
     closable: true
 };
 
+/**
+ * Instacia de opciones adicionales usadas en el modal
+ */
 const instanceOptionsModal = {
   id: 'default-modal',
   override: true
 };
 
+/**
+ * Inicializa el modal usado para el formulario
+ */
 const modal = new Modal($targetEl, optionsModal, instanceOptionsModal);
+/*********************************************************************************/
+
+/** LLAMADO DE FUNCIONES YA INSTANCIADAS **/
+
+showTablaEmpleados()
+/*********************************************************************************/
