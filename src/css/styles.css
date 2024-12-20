@@ -1,0 +1,9 @@
+.banner {
+  background: url( 'https://redarbor.net/assets/images/news/redarbor-mejor-empresa-para-trabajar-en-espana-2024-segun-great-place-to-work.jpg' );
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.bg-slate{
+  background-color: rgb(15 23 42 / var(--tw-bg-opacity, 1));
+}

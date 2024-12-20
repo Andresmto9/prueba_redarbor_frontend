@@ -1,0 +1,5 @@
+import './js/jquery'
+import './js/sweetalert'
+import './js/datatable'
+import './js/flowbite'
+import './js/languagedt'
